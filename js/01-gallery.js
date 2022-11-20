@@ -31,16 +31,22 @@ function imageHandler(evt){
     evt.preventDefault();
     if (evt.target.nodeName!=="IMG")return;
     const imageSrc=evt.target.dataset.source;
-    const instance = basicLightbox.create(`<div class="modal">
-        <img src="${imageSrc}" width="800" height="600"></div>
-    `,{closable: false})
+    const instance = basicLightbox.create(`<img src="${imageSrc}" width="800" height="600"/>
+    `,
+    {
+      onClose: (instance) =>{
+        document.removeEventListener(`keydown`,modalCloseByEsc);
+      },
+      onShow: (instance)=>{
+        document.addEventListener(`keydown`,modalCloseByEsc);
+      }
+    });
     instance.show();
     function modalCloseByEsc(evt){
-      if(evt.code==="Escape"){
-        instance.close();
-        window.removeEventListener("keydown", modalCloseByEsc);
+      if(evt.code!=="Escape"){
+        return;
       }
-    }
-    window.addEventListener("keydown",modalCloseByEsc);  
+      instance.close();
+    }  
 }
 imageGallery.addEventListener("click",imageHandler);
